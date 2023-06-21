@@ -1,10 +1,8 @@
 package com.alexfrsoares.whack_a_word.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -20,7 +18,6 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun GameBackground() {
     val configuration = LocalConfiguration.current
-    val screenWidth = configuration.screenWidthDp.dp
     val screenHeight = configuration.screenHeightDp.dp
     val brush = Brush.verticalGradient(listOf(Color(0xFFA3DEFF), Color(0xFFDCF3FF)))
 
@@ -35,12 +32,6 @@ fun GameBackground() {
             modifier = Modifier
                 .fillMaxSize()
                 .background(Color(0xFFF4D4AD))
-        ) {
-            Row(horizontalArrangement = Arrangement.SpaceEvenly) {
-                HoleInTheGround(screenWidth)
-                HoleInTheGround(screenWidth)
-                HoleInTheGround(screenWidth)
-            }
-        }
+        ) {}
     }
 }

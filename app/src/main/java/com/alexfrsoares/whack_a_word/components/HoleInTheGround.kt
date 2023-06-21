@@ -16,18 +16,18 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.Dp
 
 @Composable
-fun HoleInTheGround(screenWidth: Dp) {
+fun HoleInTheGround(parentViewWidth: Dp) {
+    val holeWidth = parentViewWidth / 5F
+    val holeHeight = holeWidth / 2.5F
     val brush = Brush.verticalGradient(listOf(Color(0xFFCE9250), Color(0xFF4A371D)))
-    val width = screenWidth / 5F
-    val height = width / 2.5F
 
     Column(
         modifier = Modifier
-            .width(width),
+            .width(holeWidth),
         verticalArrangement = Arrangement.Center
     ) {
         Box(modifier = Modifier
-            .height(height)
+            .height(holeHeight)
         ) {
             Canvas(modifier = Modifier.fillMaxSize()) {
                 drawOval(
