@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.alexfrsoares.whack_a_word.components.AnimatedCard
 import com.alexfrsoares.whack_a_word.components.GameBackground
 import com.alexfrsoares.whack_a_word.components.HoleInTheGround
 import com.alexfrsoares.whack_a_word.components.VocabularyCard
@@ -35,8 +36,9 @@ class MainActivity : ComponentActivity() {
                         .background(color = MaterialTheme.colorScheme.background)
                 ) {
 //                    VocabularyCard()
-                    GameBackground()
+//                    GameBackground()
 //                    HoleInTheGround()
+                    AnimatedCard()
                 }
             }
         }
