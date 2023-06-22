@@ -1,5 +1,6 @@
 package com.alexfrsoares.whack_a_word.components
 
+import android.media.MediaPlayer
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
@@ -12,13 +13,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.alexfrsoares.whack_a_word.R
 import com.alexfrsoares.whack_a_word.model.ViewSize
 import java.util.Timer
 import kotlin.concurrent.schedule
 
 @Composable
-fun CardComesAndGoes(showCard: Boolean, scored: (Int) -> Unit) {
+//fun CardComesAndGoes(showCard: Boolean, scored: (Int) -> Unit) {
+fun CardComesAndGoes(showCard: Boolean, scored: (Int, Boolean) -> Unit) {
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp.dp
     val viewSize = ViewSize(width = (screenWidth / 5.5F), height = (screenWidth / 5.5F * 1.5F))
@@ -26,6 +30,8 @@ fun CardComesAndGoes(showCard: Boolean, scored: (Int) -> Unit) {
         mutableStateOf(false)
     }
     val timer = Timer()
+    val context = LocalContext.current
+    val correctSound = MediaPlayer.create(context, R.raw.correct)
 
     Box(
         modifier = Modifier
@@ -43,7 +49,8 @@ fun CardComesAndGoes(showCard: Boolean, scored: (Int) -> Unit) {
                 .clickable {
                     if (isVisible) {
                         isVisible = false
-                        scored(1)
+                        scored(1, false)
+                        correctSound.start()
                         timer.cancel()
                     }
                 },
@@ -55,14 +62,20 @@ fun CardComesAndGoes(showCard: Boolean, scored: (Int) -> Unit) {
 
     if (showCard && !isVisible) {
         timer.schedule(2000) {
+//            timer.cancel()
             isVisible = true
         }
     }
 
     if (isVisible) {
-        timer.schedule(5000) {
+        if (!showCard) {
+//            timer.cancel()
             isVisible = false
-            scored(0)
+        }
+        timer.schedule(5000) {
+//            timer.cancel()
+            isVisible = false
+            scored(0, false)
         }
     }
 }
