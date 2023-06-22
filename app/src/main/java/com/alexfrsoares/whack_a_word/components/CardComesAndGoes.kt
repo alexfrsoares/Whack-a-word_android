@@ -1,8 +1,5 @@
 package com.alexfrsoares.whack_a_word.components
 
-import android.os.Handler
-import android.os.Looper
-import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
@@ -17,19 +14,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import com.alexfrsoares.whack_a_word.model.ViewSize
+import java.util.Timer
+import kotlin.concurrent.schedule
 
 @Composable
-//fun CardComesAndGoes(showCard: Boolean) {
 fun CardComesAndGoes(showCard: Boolean, scored: (Int) -> Unit) {
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp.dp
     val viewSize = ViewSize(width = (screenWidth / 5.5F), height = (screenWidth / 5.5F * 1.5F))
-    var startPopUpTimer by remember {
-        mutableStateOf(showCard)
-    }
     var isVisible by remember {
         mutableStateOf(false)
     }
+    val timer = Timer()
 
     Box(
         modifier = Modifier
@@ -47,8 +43,8 @@ fun CardComesAndGoes(showCard: Boolean, scored: (Int) -> Unit) {
                 .clickable {
                     if (isVisible) {
                         isVisible = false
-                        startPopUpTimer = false
                         scored(1)
+                        timer.cancel()
                     }
                 },
             contentAlignment = Alignment.TopCenter
@@ -57,16 +53,16 @@ fun CardComesAndGoes(showCard: Boolean, scored: (Int) -> Unit) {
         }
     }
 
-    if (startPopUpTimer) {
-        Handler(Looper.getMainLooper()).postDelayed({
+    if (showCard && !isVisible) {
+        timer.schedule(2000) {
             isVisible = true
-            startPopUpTimer = false
-        }, 5000)
+        }
     }
 
     if (isVisible) {
-        Handler(Looper.getMainLooper()).postDelayed({
+        timer.schedule(5000) {
             isVisible = false
-        }, 5000)
+            scored(0)
+        }
     }
 }

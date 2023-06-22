@@ -16,11 +16,19 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.alexfrsoares.whack_a_word.components.CardComesAndGoes
 import com.alexfrsoares.whack_a_word.components.GameBackground
+import java.util.Timer
+import kotlin.concurrent.schedule
 
 @Composable
 fun GameScreen() {
     var score by remember {
         mutableStateOf(0)
+    }
+    var cardHole by remember {
+        mutableStateOf((0..4).random())
+    }
+    var newChallenge by remember {
+        mutableStateOf(false)
     }
 
     Column {
@@ -35,11 +43,11 @@ fun GameScreen() {
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 (0..4).forEach {
-                    if (it == 3) {
+                    if (it == cardHole) {
                         CardComesAndGoes(showCard = true, scored = {
-                            Log.d("SCORE", "PREV TOTAL: $score")
                             score += it
-                            Log.d("SCORE", "NEW TOTAL: $score")
+                            newChallenge = !newChallenge
+                            Log.d("SCORE", "$score")
                         })
                     } else {
                         CardComesAndGoes(showCard = false, scored = { })
@@ -47,6 +55,12 @@ fun GameScreen() {
                 }
             }
         }
+    }
 
+    if (newChallenge) {
+        Timer().schedule(1000) {
+            cardHole = (0..4).random()
+        }
+        newChallenge = false
     }
 }
