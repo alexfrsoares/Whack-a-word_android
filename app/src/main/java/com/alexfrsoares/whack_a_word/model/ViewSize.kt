@@ -1,4 +1,4 @@
-package com.alexfrsoares.whack_a_word.data
+package com.alexfrsoares.whack_a_word.model
 
 import androidx.compose.ui.unit.Dp
 

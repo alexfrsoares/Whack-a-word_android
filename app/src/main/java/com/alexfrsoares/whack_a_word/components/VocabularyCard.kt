@@ -18,12 +18,13 @@ import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
 import coil.decode.SvgDecoder
 import com.alexfrsoares.whack_a_word.R
-import com.alexfrsoares.whack_a_word.data.ViewSize
+import com.alexfrsoares.whack_a_word.model.ViewSize
 
 @Composable
 fun VocabularyCard(parentSize: ViewSize) {
     val cardWidth = parentSize.width
     val cardHeight = parentSize.height * 0.96F
+    val image = R.drawable.fc_banana
 
     val imageLoader = ImageLoader.Builder(LocalContext.current)
         .components {
@@ -46,7 +47,7 @@ fun VocabularyCard(parentSize: ViewSize) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Image(
-                    painter = rememberAsyncImagePainter(R.drawable.fc_banana, imageLoader),
+                    painter = rememberAsyncImagePainter(image, imageLoader),
                     contentDescription = null,
                     modifier = Modifier
                         .padding(10.dp)
