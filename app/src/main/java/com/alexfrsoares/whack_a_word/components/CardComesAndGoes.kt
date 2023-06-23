@@ -37,9 +37,6 @@ fun CardComesAndGoes(showCard: Boolean = false, correctWord: Boolean = false,
         GameAudioPlayer(context)
     }
     val correctSound = R.raw.correct
-//    var wordSoundPlayed by remember {
-//        mutableStateOf(!showCard)
-//    }
 
     Box(
         modifier = Modifier
@@ -78,11 +75,8 @@ fun CardComesAndGoes(showCard: Boolean = false, correctWord: Boolean = false,
         }
     }
 
-//    if (correctWord && !wordSoundPlayed) {
     if (correctWord) {
-        Log.d("PLAY WORD SOUND", word.word)
         player.playFile(word.sound)
-//        wordSoundPlayed = true
     }
 
     if (showCard && !isVisible) {
@@ -100,4 +94,8 @@ fun CardComesAndGoes(showCard: Boolean = false, correctWord: Boolean = false,
             scored(0, false)
         }
     }
+}
+
+fun rebuildView() {
+
 }
