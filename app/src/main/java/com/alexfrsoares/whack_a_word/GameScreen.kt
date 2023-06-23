@@ -30,7 +30,7 @@ fun GameScreen() {
     val configuration = LocalConfiguration.current
     val screenHeight = configuration.screenHeightDp.dp
     val totalHoles = 5
-    var totalCardSpawning = 5
+    var totalCardSpawning = 1
     var cardSpawnHoles by remember {
         mutableStateOf(getNonRepeatingIntArray(totalCardSpawning, (totalHoles - 1)))
     }
