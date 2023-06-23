@@ -1,13 +1,13 @@
 package com.alexfrsoares.whack_a_word
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -15,6 +15,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.unit.dp
 import com.alexfrsoares.whack_a_word.components.CardComesAndGoes
 import com.alexfrsoares.whack_a_word.components.GameBackground
 import com.alexfrsoares.whack_a_word.data.gameWords
@@ -25,8 +27,10 @@ import kotlin.concurrent.schedule
 @SuppressLint("MutableCollectionMutableState")
 @Composable
 fun GameScreen() {
+    val configuration = LocalConfiguration.current
+    val screenHeight = configuration.screenHeightDp.dp
     val totalHoles = 5
-    var totalCardSpawning = 1
+    var totalCardSpawning = 5
     var cardSpawnHoles by remember {
         mutableStateOf(getNonRepeatingIntArray(totalCardSpawning, (totalHoles - 1)))
     }
@@ -59,24 +63,36 @@ fun GameScreen() {
                 val correctWordIndex = cardSpawnHoles.random()
 
                 (0 until totalHoles).forEach { spawnIndex ->
-                    if (cardSpawnHoles.contains(spawnIndex) && wordIndex < setOfWords.size) {
-                        CardComesAndGoes(
-                            showCard = showCard,
-                            word = setOfWords.elementAt(wordIndex),
-                            correctWord = correctWordIndex == spawnIndex,
-                            scored = { pointScored, cardIsVisible ->
-                                score += pointScored
-                                showCard = cardIsVisible
-                                newChallenge = true
-                            }
-                        )
+                    var topPadding = screenHeight / 3
+                    if (spawnIndex % 2 == 0) {
+                        topPadding = screenHeight / 7
+                    }
 
-                        wordIndex += 1
-                    } else {
-                        CardComesAndGoes(
-                            word = WordModel(word = "", image = 0, sound = 0),
-                            scored = { _, _ -> }
-                        )
+                    Column(
+                        modifier = Modifier
+                            .padding(top = topPadding)
+                    ) {
+                        if (cardSpawnHoles.contains(spawnIndex) && wordIndex < setOfWords.size) {
+                            CardComesAndGoes(
+                                showCard = showCard,
+                                word = setOfWords.elementAt(wordIndex),
+                                correctWord = correctWordIndex == spawnIndex,
+                                scored = { pointScored, cardIsVisible ->
+                                    score += pointScored
+                                    showCard = cardIsVisible
+                                    if (correctWordIndex == spawnIndex) {
+                                        newChallenge = true
+                                    }
+                                }
+                            )
+
+                            wordIndex += 1
+                        } else {
+                            CardComesAndGoes(
+                                word = WordModel(word = "", image = 0, sound = 0),
+                                scored = { _, _ -> }
+                            )
+                        }
                     }
                 }
             }
@@ -104,9 +120,6 @@ fun GameScreen() {
 
             cardSpawnHoles = getNonRepeatingIntArray(totalCardSpawning, (totalHoles - 1))
             setOfWords = getSetOfWords(totalCardSpawning)
-
-
-            Log.d("SCORED $score POINTS", "SHOWING $totalCardSpawning CARDS")
         }
 
         newChallenge = false
@@ -117,7 +130,7 @@ fun getNonRepeatingIntArray(totalElements: Int, maxValue: Int): MutableList<Int>
     val positions: MutableList<Int> = mutableListOf()
     var positionsLeft = totalElements
     val valueRange =
-        if (maxValue < totalElements) {
+        if (maxValue < (totalElements - 1)) {
             0..(totalElements)
         } else {
             0..(maxValue)
