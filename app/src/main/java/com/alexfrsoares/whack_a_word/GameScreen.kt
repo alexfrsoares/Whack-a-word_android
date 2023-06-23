@@ -26,7 +26,7 @@ import kotlin.concurrent.schedule
 @Composable
 fun GameScreen() {
     val totalHoles = 5
-    var totalCardSpawning = 2
+    var totalCardSpawning = 1
     var cardSpawnHoles by remember {
         mutableStateOf(getNonRepeatingIntArray(totalCardSpawning, (totalHoles - 1)))
     }
@@ -43,6 +43,7 @@ fun GameScreen() {
         mutableStateOf(false)
     }
     val timer = Timer()
+    var wordIndex = 0
 
     Column {
         Box(
@@ -60,10 +61,10 @@ fun GameScreen() {
                 (0 until totalHoles).forEach { spawnIndex ->
                     val correctWord = correctWordIndex == spawnIndex
 
-                    if (cardSpawnHoles.contains(spawnIndex)) {
+                    if (cardSpawnHoles.contains(spawnIndex) && wordIndex < setOfWords.size) {
                         CardComesAndGoes(
                             showCard = showCard,
-                            word = setOfWords.elementAt(0),
+                            word = setOfWords.elementAt(wordIndex),
                             correctWord = correctWord,
                             scored = { pointScored, cardIsVisible ->
                                 score += pointScored
@@ -71,6 +72,8 @@ fun GameScreen() {
                                 newChallenge = true
                             }
                         )
+
+                        wordIndex += 1
                     } else {
                         CardComesAndGoes(
                             word = WordModel(word = "", image = 0, sound = 0),
@@ -86,6 +89,7 @@ fun GameScreen() {
         timer.schedule(2000) {
             timer.cancel()
             showCard = true
+            wordIndex = 0
 
             totalCardSpawning =
                 if (score > 11) {
