@@ -21,10 +21,10 @@ import com.alexfrsoares.whack_a_word.R
 import com.alexfrsoares.whack_a_word.model.ViewSize
 
 @Composable
-fun VocabularyCard(parentSize: ViewSize) {
+fun VocabularyCard(parentSize: ViewSize, image: Int) {
     val cardWidth = parentSize.width
     val cardHeight = parentSize.height * 0.96F
-    val image = R.drawable.fc_banana
+//    val image = R.drawable.fc_banana
 
     val imageLoader = ImageLoader.Builder(LocalContext.current)
         .components {

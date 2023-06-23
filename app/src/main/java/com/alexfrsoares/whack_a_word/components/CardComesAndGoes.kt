@@ -1,6 +1,7 @@
 package com.alexfrsoares.whack_a_word.components
 
 import android.media.MediaPlayer
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
@@ -17,12 +18,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.alexfrsoares.whack_a_word.R
 import com.alexfrsoares.whack_a_word.model.ViewSize
+import com.alexfrsoares.whack_a_word.model.WordModel
 import java.util.Timer
 import kotlin.concurrent.schedule
 
 @Composable
 //fun CardComesAndGoes(showCard: Boolean, scored: (Int) -> Unit) {
-fun CardComesAndGoes(showCard: Boolean, scored: (Int, Boolean) -> Unit) {
+fun CardComesAndGoes(showCard: Boolean = false, correctWord: Boolean = false,
+                     word: WordModel, scored: (Int, Boolean) -> Unit) {
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp.dp
     val viewSize = ViewSize(width = (screenWidth / 5.5F), height = (screenWidth / 5.5F * 1.5F))
@@ -47,6 +50,11 @@ fun CardComesAndGoes(showCard: Boolean, scored: (Int, Boolean) -> Unit) {
         Box(
             modifier = Modifier
                 .clickable {
+                    if (correctWord) {
+                        Log.d("CORRECT", "WIN")
+                    } else {
+                        Log.d("NOT CORRECT", "LOSE")
+                    }
                     if (isVisible) {
                         isVisible = false
                         scored(1, false)
@@ -56,7 +64,11 @@ fun CardComesAndGoes(showCard: Boolean, scored: (Int, Boolean) -> Unit) {
                 },
             contentAlignment = Alignment.TopCenter
         ) {
-            AnimatedCard(parentViewWidth = screenWidth, showCard = isVisible)
+            AnimatedCard(
+                parentViewWidth = screenWidth,
+                image = word.image,
+                showCard = isVisible
+            )
         }
     }
 

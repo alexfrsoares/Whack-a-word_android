@@ -15,10 +15,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.alexfrsoares.whack_a_word.R
 import com.alexfrsoares.whack_a_word.model.ViewSize
 
 @Composable
-fun AnimatedCard(parentViewWidth: Dp, showCard: Boolean) {
+fun AnimatedCard(parentViewWidth: Dp, image: Int, showCard: Boolean) {
     val cardWidth = (parentViewWidth / 5F) * 0.8F
     val cardHeight = cardWidth * 1.5F
     val density = LocalDensity.current
@@ -43,7 +44,7 @@ fun AnimatedCard(parentViewWidth: Dp, showCard: Boolean) {
             ),
             modifier = Modifier.fillMaxWidth().weight(1f)
         ) {
-            VocabularyCard(ViewSize(width = cardWidth, height = cardHeight))
+            VocabularyCard(ViewSize(width = cardWidth, height = cardHeight), image = image)
         }
     }
 }
