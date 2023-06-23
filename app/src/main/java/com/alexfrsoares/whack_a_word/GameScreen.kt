@@ -59,13 +59,11 @@ fun GameScreen() {
                 val correctWordIndex = cardSpawnHoles.random()
 
                 (0 until totalHoles).forEach { spawnIndex ->
-                    val correctWord = correctWordIndex == spawnIndex
-
                     if (cardSpawnHoles.contains(spawnIndex) && wordIndex < setOfWords.size) {
                         CardComesAndGoes(
                             showCard = showCard,
                             word = setOfWords.elementAt(wordIndex),
-                            correctWord = correctWord,
+                            correctWord = correctWordIndex == spawnIndex,
                             scored = { pointScored, cardIsVisible ->
                                 score += pointScored
                                 showCard = cardIsVisible

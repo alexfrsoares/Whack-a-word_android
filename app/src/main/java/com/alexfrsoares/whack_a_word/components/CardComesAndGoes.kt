@@ -1,6 +1,5 @@
 package com.alexfrsoares.whack_a_word.components
 
-import android.media.MediaPlayer
 import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -19,11 +18,11 @@ import androidx.compose.ui.unit.dp
 import com.alexfrsoares.whack_a_word.R
 import com.alexfrsoares.whack_a_word.model.ViewSize
 import com.alexfrsoares.whack_a_word.model.WordModel
+import com.alexfrsoares.whack_a_word.resources.GameAudioPlayer
 import java.util.Timer
 import kotlin.concurrent.schedule
 
 @Composable
-//fun CardComesAndGoes(showCard: Boolean, scored: (Int) -> Unit) {
 fun CardComesAndGoes(showCard: Boolean = false, correctWord: Boolean = false,
                      word: WordModel, scored: (Int, Boolean) -> Unit) {
     val configuration = LocalConfiguration.current
@@ -34,7 +33,13 @@ fun CardComesAndGoes(showCard: Boolean = false, correctWord: Boolean = false,
     }
     val timer = Timer()
     val context = LocalContext.current
-    val correctSound = MediaPlayer.create(context, R.raw.correct)
+    val player by lazy {
+        GameAudioPlayer(context)
+    }
+    val correctSound = R.raw.correct
+//    var wordSoundPlayed by remember {
+//        mutableStateOf(!showCard)
+//    }
 
     Box(
         modifier = Modifier
@@ -50,16 +55,17 @@ fun CardComesAndGoes(showCard: Boolean = false, correctWord: Boolean = false,
         Box(
             modifier = Modifier
                 .clickable {
-                    if (correctWord) {
-                        Log.d("CORRECT", "WIN")
-                    } else {
-                        Log.d("NOT CORRECT", "LOSE")
-                    }
                     if (isVisible) {
                         isVisible = false
-                        scored(1, false)
-                        correctSound.start()
                         timer.cancel()
+                        if (correctWord) {
+                            Log.d("CORRECT", "WIN")
+                            player.playFile(correctSound)
+                            scored(1, false)
+                        } else {
+                            Log.d("NOT CORRECT", "LOSE")
+                            scored(0, false)
+                        }
                     }
                 },
             contentAlignment = Alignment.TopCenter
@@ -70,6 +76,12 @@ fun CardComesAndGoes(showCard: Boolean = false, correctWord: Boolean = false,
                 showCard = isVisible
             )
         }
+    }
+
+//    if (correctWord && !wordSoundPlayed) {
+    if (correctWord) {
+        player.playFile(word.sound)
+//        wordSoundPlayed = true
     }
 
     if (showCard && !isVisible) {
