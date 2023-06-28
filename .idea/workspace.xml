@@ -24,8 +24,8 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Kotlin File" />
         <option value="Kotlin Class" />
+        <option value="Kotlin File" />
       </list>
     </option>
   </component>
@@ -46,6 +46,7 @@
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.cidr.known.project.marker": "true",
+    "ScreenRecorder.SavePath": "/Users/alexfreitas/Desktop/device-2023-06-28-010908.webm",
     "cidr.known.project.marker": "true",
     "last_opened_file_path": "/Users/alexfreitas/Documents/Whack-a-word_android"
   }

@@ -15,10 +15,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.alexfrsoares.whack_a_word.R
 import com.alexfrsoares.whack_a_word.model.ViewSize
 import com.alexfrsoares.whack_a_word.model.WordModel
-import com.alexfrsoares.whack_a_word.resources.GameAudioPlayer
 import java.util.Timer
 import kotlin.concurrent.schedule
 
@@ -33,10 +31,6 @@ fun CardComesAndGoes(showCard: Boolean = false, correctWord: Boolean = false,
     }
     val timer = Timer()
     val context = LocalContext.current
-    val player by lazy {
-        GameAudioPlayer(context)
-    }
-    val correctSound = R.raw.correct
 
     Box(
         modifier = Modifier
@@ -55,12 +49,12 @@ fun CardComesAndGoes(showCard: Boolean = false, correctWord: Boolean = false,
                     if (isVisible) {
                         isVisible = false
                         timer.cancel()
+                        Log.d("WORD CLICKED", "CLICKED -> ${word.word}")
                         if (correctWord) {
-                            Log.d("CORRECT", "WIN")
-                            player.playFile(correctSound)
+//                            Log.d("CORRECT", "WIN")
                             scored(1, false)
                         } else {
-                            Log.d("NOT CORRECT", "LOSE")
+//                            Log.d("NOT CORRECT", "LOSE")
                             scored(0, false)
                         }
                     }
@@ -73,10 +67,6 @@ fun CardComesAndGoes(showCard: Boolean = false, correctWord: Boolean = false,
                 showCard = isVisible
             )
         }
-    }
-
-    if (correctWord) {
-        player.playFile(word.sound)
     }
 
     if (showCard && !isVisible) {
@@ -94,8 +84,4 @@ fun CardComesAndGoes(showCard: Boolean = false, correctWord: Boolean = false,
             scored(0, false)
         }
     }
-}
-
-fun rebuildView() {
-
 }

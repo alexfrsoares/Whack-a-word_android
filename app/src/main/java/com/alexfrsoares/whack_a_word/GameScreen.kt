@@ -1,6 +1,7 @@
 package com.alexfrsoares.whack_a_word
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,11 +17,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.alexfrsoares.whack_a_word.components.CardComesAndGoes
 import com.alexfrsoares.whack_a_word.components.GameBackground
-import com.alexfrsoares.whack_a_word.data.gameWords
+import com.alexfrsoares.whack_a_word.model.GameSetup
 import com.alexfrsoares.whack_a_word.model.WordModel
+import com.alexfrsoares.whack_a_word.resources.GameAudioPlayer
+import com.alexfrsoares.whack_a_word.resources.getGameSetup
 import java.util.Timer
 import kotlin.concurrent.schedule
 
@@ -29,25 +33,36 @@ import kotlin.concurrent.schedule
 fun GameScreen() {
     val configuration = LocalConfiguration.current
     val screenHeight = configuration.screenHeightDp.dp
+
     val totalHoles = 5
     var totalCardSpawning = 1
-    var cardSpawnHoles by remember {
-        mutableStateOf(getNonRepeatingIntArray(totalCardSpawning, (totalHoles - 1)))
-    }
-    var setOfWords: MutableList<WordModel> by remember {
-        mutableStateOf(getSetOfWords(totalCardSpawning))
-    }
+
     var showCard by remember {
         mutableStateOf(true)
     }
-    var score by remember {
-        mutableStateOf(0)
-    }
+    var score = 0
+//    var score by remember {
+//        mutableStateOf(0)
+//    }
+
     var newChallenge by remember {
-        mutableStateOf(false)
+        mutableStateOf(true)
     }
+//    var newChallenge = false
     val timer = Timer()
     var wordIndex = 0
+    val context = LocalContext.current
+    val mediaPlayer by lazy {
+        GameAudioPlayer(context)
+    }
+    var getNewGameSetup by remember {
+        mutableStateOf(false)
+    }
+    val correctSound = R.raw.correct
+//    var gameSetUp = getGameSetUp(totalCardSpawning, totalHoles, context)
+    var gameSetup: GameSetup by remember {
+        mutableStateOf(getGameSetup(totalCardSpawning, totalHoles, context))
+    }
 
     Column {
         Box(
@@ -60,9 +75,14 @@ fun GameScreen() {
                     .fillMaxSize(),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                val correctWordIndex = cardSpawnHoles.random()
+                if (newChallenge) {
+                    newChallenge = false
+                    Log.d("MARK02 NEW CHALLENGE", "newChallenge = $newChallenge")
+                }
+
 
                 (0 until totalHoles).forEach { spawnIndex ->
+                    Log.d("MARK03 BUILD COLUMNS", "SPAWN HOLE INDEX = $spawnIndex")
                     var topPadding = screenHeight / 3
                     if (spawnIndex % 2 == 0) {
                         topPadding = screenHeight / 7
@@ -72,90 +92,56 @@ fun GameScreen() {
                         modifier = Modifier
                             .padding(top = topPadding)
                     ) {
-                        if (cardSpawnHoles.contains(spawnIndex) && wordIndex < setOfWords.size) {
+                        if (gameSetup.cardSpawnHoles.contains(spawnIndex) && wordIndex < gameSetup.setOfWords.size) {
+                            if (gameSetup.correctHoleIndex == spawnIndex) {
+                                mediaPlayer.playFile(gameSetup.correctWord.sound)
+                            }
+                            val word = gameSetup.setOfWords.elementAt(wordIndex)
+                            Log.d("MARK03.1 SPAWN HOLES", "** WORD = ${word.word} / SPAWN INDEX = $spawnIndex / SHOW CARD = $showCard")
                             CardComesAndGoes(
                                 showCard = showCard,
-                                word = setOfWords.elementAt(wordIndex),
-                                correctWord = correctWordIndex == spawnIndex,
+                                word = gameSetup.setOfWords.elementAt(wordIndex),
+                                correctWord = gameSetup.correctHoleIndex == spawnIndex,
                                 scored = { pointScored, cardIsVisible ->
                                     score += pointScored
                                     showCard = cardIsVisible
-                                    if (correctWordIndex == spawnIndex) {
-                                        newChallenge = true
+                                    if (gameSetup.correctHoleIndex == spawnIndex) {
+                                        if (pointScored > 0) {
+                                            mediaPlayer.playFile(correctSound)
+                                        }
+                                        getNewGameSetup = true
+                                        Log.d("MARK04 CLICKED", "getNewGameSetup = $getNewGameSetup")
                                     }
                                 }
                             )
-
                             wordIndex += 1
                         } else {
+                            Log.d("MARK03.2 ORDINARY HOLES", "SPAWN HOLE INDEX = $spawnIndex")
                             CardComesAndGoes(
                                 word = WordModel(word = "", image = 0, sound = 0),
                                 scored = { _, _ -> }
                             )
+                            wordIndex += 1
                         }
                     }
+
                 }
             }
         }
     }
 
-    if (newChallenge) {
-        timer.schedule(2000) {
-            timer.cancel()
-            showCard = true
-            wordIndex = 0
-
-            totalCardSpawning =
-                if (score > 11) {
-                    5
-                } else if (score > 8) {
-                    4
-                } else if (score > 5) {
-                    3
-                } else if (score > 2) {
-                    2
-                } else {
-                    1
-                }
-
-            cardSpawnHoles = getNonRepeatingIntArray(totalCardSpawning, (totalHoles - 1))
-            setOfWords = getSetOfWords(totalCardSpawning)
-        }
-
-        newChallenge = false
-    }
-}
-
-fun getNonRepeatingIntArray(totalElements: Int, maxValue: Int): MutableList<Int> {
-    val positions: MutableList<Int> = mutableListOf()
-    var positionsLeft = totalElements
-    val valueRange =
-        if (maxValue < (totalElements - 1)) {
-            0..(totalElements)
-        } else {
-            0..(maxValue)
-        }
-
-    while (positions.size <= totalElements && positionsLeft > 0) {
-        val newPosition = (valueRange).random()
-
-        if (!positions.contains(newPosition)) {
-            positions.add(newPosition)
-            positionsLeft -= 1
+    if (getNewGameSetup) {
+        getNewGameSetup = false
+        mediaPlayer.playFile(gameSetup.correctWord.sound)
+        showCard = true
+        Log.d("MARK00 GET NEW GAME SETUP", "getNewGameSetup = $getNewGameSetup")
+        timer.schedule(1000) {
+            val prevGame = gameSetup
+            gameSetup = getGameSetup(totalCardSpawning, totalHoles, context)
+            if (gameSetup != prevGame) {
+                newChallenge = true
+                Log.d("MARK01.6 NEW CHALLENGE", "newChallenge = $newChallenge")
+            }
         }
     }
-
-    return positions
-}
-
-fun getSetOfWords(totalElements: Int): MutableList<WordModel> {
-    val indexes = getNonRepeatingIntArray(totalElements, (gameWords.size - 1))
-    val selectedWords: MutableList<WordModel> = mutableListOf()
-
-    for (index in 0 until indexes.size) {
-        val gameWordIndex = indexes.elementAt(index)
-        selectedWords.add(gameWords.elementAt(gameWordIndex))
-    }
-
-    return selectedWords
 }
